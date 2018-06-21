@@ -4,6 +4,8 @@
 
 rm(list=ls())
 
+# find location of the script
+# https://stackoverflow.com/questions/46229411/set-the-working-directory-to-the-parent-folder-of-the-script-file-in-r
 thisFile <- function() {
     cmdArgs <- commandArgs(trailingOnly = FALSE)
     needle <- "--file="
