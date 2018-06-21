@@ -3,7 +3,7 @@
 # Chang Xu, 13NOV2017
 
 rm(list=ls())
-setwd('C:/Users/xuc/Documents/duplexTag/error_reestimated')
+setwd("/u/creggian/programmi/smcounter-v2-paper/background_error_profile")
 library(fitdistrplus)
 library(Hmisc)
 library(gPdtest)
@@ -34,8 +34,8 @@ rev <- function(x){
 min.mtDepth <- 1000
 pMax <- 0.01
 # this file contains HC region (v3.3.2), homozygous reference, filter passed, non-repetitive region sites
-bkg1 <- read.delim('intermediate/bkg.duplex_oneReadPairUMIsDropped.txt', header=T)
-bkg2 <- read.delim('intermediate/bkg.duplex_oneReadPairUMIsIncluded.txt', header=T)
+bkg1 <- read.delim('bkg.duplex_oneReadPairUMIsDropped.txt', header=T)
+bkg2 <- read.delim('bkg.duplex_oneReadPairUMIsIncluded.txt', header=T)
 
 types <- c('AC', 'AG', 'AT', 'CA', 'CG', 'CT', 'GA', 'GC', 'GT', 'TA', 'TC', 'TG')
 
@@ -59,61 +59,6 @@ tmp <- mutate(dat, sum8 = A.C + C.A + A.T + T.A + C.G + G.C + G.T + T.G, total8 
   filter(total8 > 80000 & p8 < .001)
 plot(density(tmp$p8))
 summary(tmp$p8)
-
-# # Beta distribution + P(0)
-# fit.beta.mle.ag <- fitdist(pAG[pAG>0], distr='beta', method='mle')
-# fit.beta.mle.ga <- fitdist(pGA[pGA>0], distr='beta', method='mle')
-# fit.beta.mle.ct <- fitdist(pCT[pCT>0], distr='beta', method='mle')
-# fit.beta.mle.tc <- fitdist(pTC[pTC>0], distr='beta', method='mle')
-# 
-# p0 <- c(length(pAG[pAG==0])/length(pAG), length(pGA[pGA==0])/length(pGA), length(pCT[pCT==0])/length(pCT), length(pTC[pTC==0])/length(pTC))
-# shape1 <- c(fit.beta.mle.ag$estimate[1], fit.beta.mle.ga$estimate[1], fit.beta.mle.ct$estimate[1], fit.beta.mle.tc$estimate[1])
-# shape2 <- c(fit.beta.mle.ag$estimate[2], fit.beta.mle.ga$estimate[2], fit.beta.mle.ct$estimate[2], fit.beta.mle.tc$estimate[2])
-# type <- c('A/G', 'G/A', 'C/T', 'T/C')
-# top4 <- data.frame(type, p0, shape1, shape2)
-# bkg.error <- list(top4.exclude.1rpUMI=top4)
-# 
-# # generate random numbers according to the fitted distributions
-# r.beta.ag <- c(rep(0, round(nsim*p0[1])), rbeta(nsim-round(nsim*p0[1]), shape1[1], shape2[1]))
-# r.beta.ga <- c(rep(0, round(nsim*p0[2])), rbeta(nsim-round(nsim*p0[2]), shape1[2], shape2[2]))
-# r.beta.ct <- c(rep(0, round(nsim*p0[3])), rbeta(nsim-round(nsim*p0[3]), shape1[3], shape2[3]))
-# r.beta.tc <- c(rep(0, round(nsim*p0[4])), rbeta(nsim-round(nsim*p0[4]), shape1[4], shape2[4]))
-# 
-# # evaluate the fit -- QQplot
-# png('QQplot.beta.exclude_1rpUMI.png', height=1200, width=1200, res=200)
-# par(mfrow=c(2,2))
-# for(type in c('AG', 'GA', 'CT', 'TC')){
-#   r <- eval(parse(text=paste0('r.beta.', tolower(type)))) 
-#   p <- eval(parse(text=paste0('p', type)))
-#   qqplot(p, r, xlab='observed', ylab='fitted', main=type)
-#   abline(a=0, b=1, col='red', lty=2)
-# }
-# dev.off()
-# 
-# # evaluate the fit -- density function in the tail
-# png('tail.beta.exclude_1rpUMI.png', height=1200, width=1200, res=200)
-# par(mfrow=c(2,2))
-# for(type in c('AG', 'GA', 'CT', 'TC')){
-#   p <- eval(parse(text=paste0('p', type)))
-#   plot(density(p[p>0]), xlim=c(.0008, .002), ylim=c(0, 100), main=type, xlab='')
-#   fit <- eval(parse(text=paste0('fit.beta.mle.', tolower(type))))
-#   a <- fit$estimate[1]
-#   b <- fit$estimate[2]
-#   curve(dbeta(x, a, b), add=T, col='red', lty=2)
-# }
-# dev.off()
-# 
-# # evaluate the fit -- ecdf
-# png('ECDF.beta.exclude_1rpUMI.png', height=1200, width=1200, res=200)
-# par(mfrow=c(2,2))
-# for(type in c('AG', 'GA', 'CT', 'TC')){
-#   r <- eval(parse(text=paste0('r.beta.', tolower(type)))) 
-#   p <- eval(parse(text=paste0('p', type)))
-#   plot(ecdf(p), xlab='', main=type, ylim=c(0.95, 1))
-#   lines(ecdf(r), lty=2, col='red')
-#   legend(x='bottomright', legend=c('observed', 'fitted'), lty=1:2, col=c('black', 'red'))
-# }
-# dev.off()
 
 
 #######################  Beta distribution + Pareto tail  ######################
@@ -173,55 +118,6 @@ r.exc1.ga <- r.ga
 r.exc1.ct <- r.ct
 r.exc1.tc <- r.tc
 
-# evaluate the fit -- QQplot
-# png('QQplot.piecewise.exclude_1rpUMI.png', height=1200, width=1200, res=200)
-png('tmp.QQplot.piecewise.exclude_1rpUMI.png', height=1200, width=1200, res=200)
-par(mfrow=c(2,2))
-for(type in c('AG', 'GA', 'CT', 'TC')){
-  r <- eval(parse(text=paste0('r.', tolower(type)))) 
-  p <- eval(parse(text=paste0('p', type)))
-  qqplot(p, r, xlab='observed', ylab='fitted', main=type)
-  abline(a=0, b=1, col='red', lty=2)
-}
-dev.off()
-
-# evaluate the fit -- full density
-png('density.piecewise.exclude_1rpUMI.png', height=1200, width=1200, res=200)
-par(mfrow=c(2,2))
-for(type in c('AG', 'GA', 'CT', 'TC')){
-  p <- eval(parse(text=paste0('p', type)))
-  plot(density(p), xlim=c(0, .002), ylim=c(0, 5000), main=type, xlab='')
-  
-  fit <- eval(parse(text=paste0('r.', tolower(type))))
-  lines(density(fit), col='red', lty=2)
-}
-dev.off()
-
-# evaluate the fit -- density function in the tail
-png('tail.piecewise.exclude_1rpUMI.png', height=1200, width=1200, res=200)
-par(mfrow=c(2,2))
-for(type in c('AG', 'GA', 'CT', 'TC')){
-  p <- eval(parse(text=paste0('p', type)))
-  plot(density(p), xlim=c(0.0008, .002), ylim=c(0, 100), main=type, xlab='')
-  
-  fit <- eval(parse(text=paste0('r.', tolower(type))))
-  lines(density(fit), col='red', lty=2)
-}
-dev.off()
-
-# evaluate the fit -- ecdf
-png('ECDF.piecewise.exclude_1rpUMI.png', height=1200, width=1200, res=200)
-par(mfrow=c(2,2))
-for(type in c('AG', 'GA', 'CT', 'TC')){
-  r <- eval(parse(text=paste0('r.', tolower(type)))) 
-  p <- eval(parse(text=paste0('p', type)))
-  plot(ecdf(p), xlab='', main=type, ylim=c(0.95, 1))
-  lines(ecdf(r), lty=2, col='red')
-  legend(x='bottomright', legend=c('observed', 'fitted'), lty=1:2, col=c('black', 'red'))
-}
-dev.off()
-
-
 
 #####################################################
 # including 1 read MTs
@@ -237,63 +133,6 @@ for(type in types){
     filter(p < pMax)
   assign(paste0('p', ref, alt), tmp$p)
 }
-
-# # Beta distribution + P(0)
-# fit.beta.mle.ag <- fitdist(pAG[pAG>0], distr='beta', method='mle')
-# fit.beta.mle.ga <- fitdist(pGA[pGA>0], distr='beta', method='mle')
-# fit.beta.mle.ct <- fitdist(pCT[pCT>0], distr='beta', method='mle')
-# fit.beta.mle.tc <- fitdist(pTC[pTC>0], distr='beta', method='mle')
-# 
-# p0 <- c(length(pAG[pAG==0])/length(pAG), length(pGA[pGA==0])/length(pGA), length(pCT[pCT==0])/length(pCT), length(pTC[pTC==0])/length(pTC))
-# shape1 <- c(fit.beta.mle.ag$estimate[1], fit.beta.mle.ga$estimate[1], fit.beta.mle.ct$estimate[1], fit.beta.mle.tc$estimate[1])
-# shape2 <- c(fit.beta.mle.ag$estimate[2], fit.beta.mle.ga$estimate[2], fit.beta.mle.ct$estimate[2], fit.beta.mle.tc$estimate[2])
-# type <- c('A/G', 'G/A', 'C/T', 'T/C')
-# top4 <- data.frame(type, p0, shape1, shape2)
-# bkg.error <- list(top4.exclude.1rpUMI=top4)
-# 
-# # generate random numbers according to the fitted distributions
-# r.beta.ag <- c(rep(0, round(nsim*p0[1])), rbeta(nsim-round(nsim*p0[1]), shape1[1], shape2[1]))
-# r.beta.ga <- c(rep(0, round(nsim*p0[2])), rbeta(nsim-round(nsim*p0[2]), shape1[2], shape2[2]))
-# r.beta.ct <- c(rep(0, round(nsim*p0[3])), rbeta(nsim-round(nsim*p0[3]), shape1[3], shape2[3]))
-# r.beta.tc <- c(rep(0, round(nsim*p0[4])), rbeta(nsim-round(nsim*p0[4]), shape1[4], shape2[4]))
-# 
-# # evaluate the fit -- QQplot
-# png('QQplot.beta.include_1rpUMI.png', height=1200, width=1200, res=200)
-# par(mfrow=c(2,2))
-# for(type in c('AG', 'GA', 'CT', 'TC')){
-#   r <- eval(parse(text=paste0('r.beta.', tolower(type)))) 
-#   p <- eval(parse(text=paste0('p', type)))
-#   qqplot(p, r, xlab='observed', ylab='fitted', main=type)
-#   abline(a=0, b=1, col='red', lty=2)
-# }
-# dev.off()
-# 
-# # evaluate the fit -- density function in the tail
-# png('tail.beta.include_1rpUMI.png', height=1200, width=1200, res=200)
-# par(mfrow=c(2,2))
-# for(type in c('AG', 'GA', 'CT', 'TC')){
-#   p <- eval(parse(text=paste0('p', type)))
-#   plot(density(p[p>0]), xlim=c(.0008, .002), ylim=c(0, 100), main=type, xlab='')
-#   fit <- eval(parse(text=paste0('fit.beta.mle.', tolower(type))))
-#   a <- fit$estimate[1]
-#   b <- fit$estimate[2]
-#   curve(dbeta(x, a, b), add=T, col='red', lty=2)
-# }
-# dev.off()
-# 
-# # evaluate the fit -- ecdf
-# png('ECDF.beta.include_1rpUMI.png', height=1200, width=1200, res=200)
-# par(mfrow=c(2,2))
-# for(type in c('AG', 'GA', 'CT', 'TC')){
-#   r <- eval(parse(text=paste0('r.beta.', tolower(type)))) 
-#   p <- eval(parse(text=paste0('p', type)))
-#   plot(ecdf(p), xlab='', main=type, ylim=c(0.95, 1))
-#   lines(ecdf(r), lty=2, col='red')
-#   legend(x='bottomright', legend=c('observed', 'fitted'), lty=1:2, col=c('black', 'red'))
-# }
-# dev.off()
-
-
 
 #####################################
 # paretoQPlot(pTC)
@@ -351,52 +190,6 @@ r.inc1.ga <- r.ga
 r.inc1.ct <- r.ct
 r.inc1.tc <- r.tc
 
-# evaluate the fit -- QQplot
-png('QQplot.piecewise.include_1rpUMI.png', height=1200, width=1200, res=200)
-par(mfrow=c(2,2))
-for(type in c('AG', 'GA', 'CT', 'TC')){
-  r <- eval(parse(text=paste0('r.', tolower(type)))) 
-  p <- eval(parse(text=paste0('p', type)))
-  qqplot(p, r, xlab='observed', ylab='fitted', main=type)
-  abline(a=0, b=1, col='red', lty=2)
-}
-dev.off()
-
-# evaluate the fit -- full density
-png('density.piecewise.include_1rpUMI.png', height=1200, width=1200, res=200)
-par(mfrow=c(2,2))
-for(type in c('AG', 'GA', 'CT', 'TC')){
-  p <- eval(parse(text=paste0('p', type)))
-  plot(density(p), xlim=c(0, .002), ylim=c(0, 5000), main=type, xlab='')
-  
-  fit <- eval(parse(text=paste0('r.', tolower(type))))
-  lines(density(fit), col='red', lty=2)
-}
-dev.off()
-
-# evaluate the fit -- density function in the tail
-png('tail.piecewise.include_1rpUMI.png', height=1200, width=1200, res=200)
-par(mfrow=c(2,2))
-for(type in c('AG', 'GA', 'CT', 'TC')){
-  p <- eval(parse(text=paste0('p', type)))
-  plot(density(p), xlim=c(0.0008, .002), ylim=c(0, 100), main=type, xlab='')
-  
-  fit <- eval(parse(text=paste0('r.', tolower(type))))
-  lines(density(fit), col='red', lty=2)
-}
-dev.off()
-
-# evaluate the fit -- ecdf
-png('ECDF.piecewise.include_1rpUMI.png', height=1200, width=1200, res=200)
-par(mfrow=c(2,2))
-for(type in c('AG', 'GA', 'CT', 'TC')){
-  r <- eval(parse(text=paste0('r.', tolower(type)))) 
-  p <- eval(parse(text=paste0('p', type)))
-  plot(ecdf(p), xlab='', main=type, ylim=c(0.95, 1))
-  lines(ecdf(r), lty=2, col='red')
-  legend(x='bottomright', legend=c('observed', 'fitted'), lty=1:2, col=c('black', 'red'))
-}
-dev.off()
 
 ##################################################################
 # save fit statistics for calculating p-values
@@ -413,4 +206,3 @@ bkg.error <- list(parameters.include_1rpUMI = parameters.include_1rpUMI,
                   r.inc1.tc = r.inc1.tc)
 
 save(bkg.error, file='bkg.error.v2.4.RData')
-#load(file='bkg.error.v2.4.RData')
